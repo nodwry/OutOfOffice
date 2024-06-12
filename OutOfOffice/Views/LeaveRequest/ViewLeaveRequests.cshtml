@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Leave Requests List";
+}
+
+@model IEnumerable<LeaveRequest>
+
+<table class="table">
+    <tr>
+        <td>ID</td>
+        <td>Employee ID</td>
+        <td>Absence Reason</td>
+        <td>From</td>
+        <td>To</td>
+        <td>Comment</td>
+        <td>Status</td>
+    </tr>
+    @foreach (var leaveRequest in Model)
+    {
+        <tr>
+            <td>@leaveRequest.ID</td>
+            <td>@leaveRequest.EmployeeId</td>
+            <td>@leaveRequest.AbsenseReason</td>
+            <td>@leaveRequest.StartDate.ToShortDateString()</td>
+            <td>@leaveRequest.EndDate.ToShortDateString()</td>
+            <td>@leaveRequest.Comment</td>
+            <td>@leaveRequest.LeaveRequestStatus</td>
+        </tr>
+    }
+</table>

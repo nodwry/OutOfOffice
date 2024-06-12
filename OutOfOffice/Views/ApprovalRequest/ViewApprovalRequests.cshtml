@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Approval Requests List";
+}
+
+@model IEnumerable<ApprovalRequest>
+
+<table class="table">
+    <tr>
+        <td>ID</td>
+        <td>Employee ID</td>
+        <td>Leave Request ID</td>
+        <td>Status</td>
+        <td>Comment</td>
+        
+    </tr>
+    @foreach (var approvalRequest in Model)
+    {
+        <tr>
+            <td>@approvalRequest.ID</td>
+            <td>@approvalRequest.EmployeeId</td>
+            <td>@approvalRequest.LeaveRequestId</td>
+            <td>@approvalRequest.ApprovalRequestStatus</td>
+            <td>@approvalRequest.Comment</td>
+        </tr>
+    }
+</table>

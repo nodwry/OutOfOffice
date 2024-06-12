@@ -12,9 +12,11 @@ namespace OutOfOffice.Models
 		[ForeignKey("Approver")]
 		public int EmployeeId { get; set; }
 
-		public int LeaveRequestId { get; set; }
+        public LeaveRequest LeaveRequest { get; set; }
 
-		public RequestStatus ApprovalRequestStatus { get; set; } = RequestStatus.New;
+        public int LeaveRequestId { get; set; }
+
+		public RequestStatus ApprovalRequestStatus { get; set; }
 
 		public string? Comment { get; set; }
     }

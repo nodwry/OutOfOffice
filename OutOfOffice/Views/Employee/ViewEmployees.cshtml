@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Employee List";
+}
+
+@model IEnumerable<Employee>
+
+
+<table class="table">
+    <tr>
+        <td>Employee ID</td>
+        <td>Full Name</td>
+        <td>Subdivision</td>
+        <td>Position</td>
+        <td>Status</td>
+        <td>People Partner ID</td>
+        <td>People Partner</td>
+        <td>Balance</td>
+    </tr>
+    @foreach (var employee in Model)
+    {
+        <tr>
+            <td>@employee.Id</td>
+            <td>@employee.FullName</td>
+            <td>@employee.Subdivision</td>
+            <td>@employee.Position</td>
+            <td>@employee.EmployeeStatus</td>
+            <td>@employee.PeoplePartnerId</td>
+            <td>@employee.PeoplePartner.FullName</td>
+            <td>@employee.Balance</td>
+        </tr>
+    }
+</table>

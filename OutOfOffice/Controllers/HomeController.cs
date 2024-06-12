@@ -18,9 +18,8 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        var employees = _dbContext.Employees.ToList();
 
-        return View(employees);
+        return View();
     }
 
     public IActionResult Privacy()

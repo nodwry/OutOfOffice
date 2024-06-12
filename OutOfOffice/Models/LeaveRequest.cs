@@ -4,21 +4,26 @@ namespace OutOfOffice.Models
 
 	public enum AbsenseReason
 	{
-
+		Vacation,
+		SickLeave,
+		FamilyEvent
 	}
 
 	public enum RequestStatus
 	{
 		New,
 		Rejected,
-		Approved
+		Approved,
+		Cancelled
 	}
 
 	public class LeaveRequest
 	{
 		public int ID { get; set; }
 
-		public int EmployeeId { get; set; }
+        public Employee Employee { get; set; }
+
+        public int EmployeeId { get; set; }
 
 		public AbsenseReason AbsenseReason { get; set; }
 
@@ -28,7 +33,7 @@ namespace OutOfOffice.Models
 
 		public string? Comment { get; set; }
 
-		public RequestStatus LeaveRequestStatus { get; set; } = RequestStatus.New;
+		public RequestStatus LeaveRequestStatus { get; set; } 
 
     }
 }

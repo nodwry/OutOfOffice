@@ -4,12 +4,18 @@ namespace OutOfOffice.Models
 
 	public enum Subdivision
 	{
-
+		QA,
+		Dev,
+		PeoplePartner
 	}
 
 	public enum Position
 	{
-		
+		QA,
+		FrontEnd,
+		BackEnd,
+		HR,
+		PM
 	}
 
     public enum EmployeeStatus
@@ -37,7 +43,7 @@ namespace OutOfOffice.Models
         public int Balance { get; set; }
 
 		//photo
-		//people partner
+		
 
 
 	}
