@@ -23,11 +23,13 @@ namespace OutOfOffice.Models
 
         public DateTime EndDate { get; set; }
 
+        public Employee? ProjectManager { get; set; }
+
+        public int ProjectManagerID { get; set; }
+
         public string? Comment { get; set; }
 
         public ProjectStatus Status { get; set; }
-
-        //project manager
 
     }
 }

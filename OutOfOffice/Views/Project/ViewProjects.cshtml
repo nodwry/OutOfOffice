@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Projects List";
+}
+
+@model IEnumerable<Project>
+
+    <style>
+        th {
+            cursor: pointer;
+        }
+    </style>
+
+<table class="table" id="projectsTable">
+    <thead>
+        <tr>
+            <th id="idHeader">ID</th>
+            <th id="projectTypeHeader">Project Type</th>
+            <th id="startDateHeader">Start Date</th>
+            <th id="endDateHeader">End Date</th>
+            <th id="projectManagerIDHeader">Project Manager ID</th>
+            <th id="commentHeader">Comment</th>
+            <th id="statusHeader">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var project in Model)
+        {
+            <tr>
+                <td>@project.Id</td>
+                <td>@project.ProjectType</td>
+                <td>@project.StartDate.ToShortDateString()</td>
+                <td>@project.EndDate.ToShortDateString()</td>
+                <td>@project.ProjectManagerID</td>
+                <td>@project.Comment</td>
+                <td>@project.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>document.addEventListener("DOMContentLoaded", function() {
+            const getCellValue = (row, index) => row.children[index].innerText || row.children[index].textContent;
+
+            const comparer = (index, asc) => (a, b) => ((v1, v2) =>
+                v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+            )(getCellValue(asc ? a : b, index), getCellValue(asc ? b : a, index));
+
+            document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+                const table = th.closest('table');
+                const tbody = table.querySelector('tbody');
+                Array.from(tbody.querySelectorAll('tr'))
+                    .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+                    .forEach(tr => tbody.appendChild(tr) );
+            })));
+        });</script>
+}
+
+

@@ -7,22 +7,22 @@ using OutOfOffice.Data;
 
 namespace OutOfOffice.Controllers
 {
-    public class ApprovalRequestController : Controller
+    public class ProjectController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _dbContext;
 
-        public ApprovalRequestController(ILogger<HomeController> logger, ApplicationDbContext dbContext)
+        public ProjectController(ILogger<HomeController> logger, ApplicationDbContext dbContext)
         {
             _logger = logger;
             _dbContext = dbContext;
         }
 
-        public IActionResult ViewApprovalRequests()
+        public IActionResult ViewProjects()
         {
-            var approvalRequests = _dbContext.ApprovalRequests.ToList();
+            var projects = _dbContext.Projects.ToList();
 
-            return View(approvalRequests);
+            return View(projects);
         }
     }
 }
