@@ -4,23 +4,44 @@
 
 @model IEnumerable<ApprovalRequest>
 
-<table class="table">
-    <tr>
-        <td>ID</td>
-        <td>Approver</td>
-        <td>Leave Request ID</td>
-        <td>Status</td>
-        <td>Comment</td>
-        
-    </tr>
-    @foreach (var approvalRequest in Model)
-    {
+<table class="table" id="approvalRequestsTable">
+    <thead>
         <tr>
-            <td>@approvalRequest.ID</td>
-            <td>@approvalRequest.EmployeeId</td>
-            <td>@approvalRequest.LeaveRequestId</td>
-            <td>@approvalRequest.ApprovalRequestStatus</td>
-            <td>@approvalRequest.Comment</td>
+            <th id="idHeader">ID</th>
+            <th id="approverHeader">Approver</th>
+            <th id="leaveRequestIdHeader">Leave Request ID</th>
+            <th id="statusHeader">Status</th>
+            <th id="commentHeader">Comment</th>
         </tr>
-    }
+    </thead>
+    <tbody>
+        @foreach (var approvalRequest in Model)
+        {
+            <tr>
+                <td>@approvalRequest.ID</td>
+                <td>@approvalRequest.EmployeeId</td>
+                <td>@approvalRequest.LeaveRequestId</td>
+                <td>@approvalRequest.ApprovalRequestStatus</td>
+                <td>@approvalRequest.Comment</td>
+            </tr>
+        }
+    </tbody>
 </table>
+
+@section Scripts {
+    <script>document.addEventListener("DOMContentLoaded", function() {
+            const getCellValue = (row, index) => row.children[index].innerText || row.children[index].textContent;
+
+            const comparer = (index, asc) => (a, b) => ((v1, v2) =>
+                v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+            )(getCellValue(asc ? a : b, index), getCellValue(asc ? b : a, index));
+
+            document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+                const table = th.closest('table');
+                const tbody = table.querySelector('tbody');
+                Array.from(tbody.querySelectorAll('tr'))
+                    .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+                    .forEach(tr => tbody.appendChild(tr) );
+            })));
+        });</script>
+}

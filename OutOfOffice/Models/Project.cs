@@ -1,9 +1,13 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
+
 namespace OutOfOffice.Models
 {
     public enum ProjectTypes
     {
         Billiable,
+        [Display(Name = "Non-billiable")]
         NonBilliable
     }
 

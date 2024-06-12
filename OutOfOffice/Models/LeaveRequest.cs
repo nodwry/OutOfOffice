@@ -1,12 +1,17 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
+
 namespace OutOfOffice.Models
 {
 
 	public enum AbsenseReason
 	{
 		Vacation,
-		SickLeave,
-		FamilyEvent
+        [Display(Name = "Sick Leave")]
+        SickLeave,
+        [Display(Name = "Family Event")]
+        FamilyEvent
 	}
 
 	public enum RequestStatus
