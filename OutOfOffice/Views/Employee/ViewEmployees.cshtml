@@ -16,6 +16,7 @@
             <th id="peoplePartnerIdHeader">People Partner ID</th>
             <th id="peoplePartnerHeader">People Partner</th>
             <th id="balanceHeader">Balance</th>
+            <th id="actionHeader">Action</th>
         </tr>
     </thead>
     <tbody>
@@ -30,6 +31,10 @@
                 <td>@employee.PeoplePartnerId</td>
                 <td>@employee.PeoplePartner.FullName</td>
                 <td>@employee.Balance</td>
+                <td>
+                    <a href="@Url.Action("UpdateEmployee", "Employee",new { employeeID = employee.Id })" class="btn btn-custom-grey btn-sm">Update</a>
+                    <a href="@Url.Action("DeactivateEmployee", "Employee", new { id = employee.Id })" class="btn btn-custom-grey btn-sm">Deactivate</a>
+                </td>
             </tr>
         }
     </tbody>

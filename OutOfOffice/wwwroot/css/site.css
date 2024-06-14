@@ -26,4 +26,9 @@ th {
     cursor: pointer;
 }
 
+.btn-custom-grey {
+    background-color: #f8f9fa;
+    color: #000;
+    border-color: #dcdcdc;
+}
 

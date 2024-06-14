@@ -1,15 +1,17 @@
 ﻿@model OutOfOffice.Models.Employee
 
 @{
-    ViewBag.Title = "Add Employee";
+    ViewBag.Title = "Update Employee";
 }
 
-<h2>Add Employee</h2>
+<h2>Update Employee</h2>
 
-<form asp-action="PostAddEmployee" method="post" class="form-horizontal">
+<form asp-action="PostUpdateEmployee" method="post" class="form-horizontal">
     <div class="form-horizontal">
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <input asp-for="Id" type="hidden" />
 
         <div class="form-group">
             <label asp-for="FullName" class="control-label col-md-2"></label>
@@ -23,7 +25,6 @@
             <label asp-for="Subdivision" class="control-label col-md-2"></label>
             <div class="col-md-10">
                 <select asp-for="Subdivision" class="form-control">
-                    <option value="">-- Select Subdivision --</option>
                     @foreach (var item in Enum.GetValues(typeof(OutOfOffice.Models.Subdivision)))
                     {
                         <option value="@item">@item</option>
@@ -37,7 +38,6 @@
             <label asp-for="Position" class="control-label col-md-2"></label>
             <div class="col-md-10">
                 <select asp-for="Position" class="form-control">
-                    <option value="">-- Select Position --</option>
                     @foreach (var item in Enum.GetValues(typeof(OutOfOffice.Models.Position)))
                     {
                         <option value="@item">@item</option>
@@ -51,7 +51,6 @@
             <label asp-for="EmployeeStatus" class="control-label col-md-2"></label>
             <div class="col-md-10">
                 <select asp-for="EmployeeStatus" class="form-control">
-                    <option value="">-- Select Employee Status --</option>
                     @foreach (var item in Enum.GetValues(typeof(OutOfOffice.Models.EmployeeStatus)))
                     {
                         <option value="@item">@item</option>
@@ -60,31 +59,31 @@
                 <span asp-validation-for="EmployeeStatus" class="text-danger"></span>
             </div>
         </div>
-     
-            <div class="form-group">
-                <label asp-for="PeoplePartnerId" class="control-label col-md-2"></label>
-                <div class="col-md-10">
-                    <select asp-for="PeoplePartnerId" class="form-control" asp-items="ViewBag.PeoplePartners"></select>
-                    <span asp-validation-for="PeoplePartnerId" class="text-danger"></span>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <label asp-for="Balance" class="control-label col-md-2"></label>
-                <div class="col-md-10">
-                    <input asp-for="Balance" class="form-control" />
-                    <span asp-validation-for="Balance" class="text-danger"></span>
-                </div>
-            </div>
-
-            <div class="form-group" style="margin-top: 20px;">
-                <div class="col-md-offset-2 col-md-10">
-                    <button type="submit" class="btn btn-primary">Create</button>
-                </div>
+        <div class="form-group">
+            <label asp-for="PeoplePartnerId" class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <select asp-for="PeoplePartnerId" class="form-control" asp-items="ViewBag.PeoplePartners"></select>
+                <span asp-validation-for="PeoplePartnerId" class="text-danger"></span>
             </div>
         </div>
-    </form>
 
-    @section Scripts {
-        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    }
+        <div class="form-group">
+            <label asp-for="Balance" class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <input asp-for="Balance" class="form-control" />
+                <span asp-validation-for="Balance" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 20px;">
+            <div class="col-md-offset-2 col-md-10">
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
