@@ -17,6 +17,7 @@ namespace OutOfOffice.Models
 	public enum RequestStatus
 	{
 		New,
+		Submitted,
 		Rejected,
 		Approved,
 		Cancelled
@@ -26,7 +27,7 @@ namespace OutOfOffice.Models
 	{
 		public int ID { get; set; }
 
-        public Employee Employee { get; set; }
+        public Employee? Employee { get; set; }
 
         public int EmployeeId { get; set; }
 
@@ -38,7 +39,11 @@ namespace OutOfOffice.Models
 
 		public string? Comment { get; set; }
 
-		public RequestStatus LeaveRequestStatus { get; set; } 
+		public RequestStatus LeaveRequestStatus { get; set; }
+
+		public DateTime SubmittedTime { get; set; }
+
+		public DateTime LastStatusChange { get; set; }
 
     }
 }

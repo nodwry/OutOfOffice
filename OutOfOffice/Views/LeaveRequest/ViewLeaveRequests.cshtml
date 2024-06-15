@@ -2,7 +2,7 @@
     ViewData["Title"] = "Leave Requests List";
 }
 
-@model IEnumerable<LeaveRequest>
+@model IEnumerable<OutOfOffice.Models.LeaveRequest>
 
 <table class="table">
     <thead>
@@ -22,7 +22,7 @@
             <tr>
                 <td>@leaveRequest.ID</td>
                 <td>@leaveRequest.EmployeeId</td>
-                <td>@leaveRequest.AbsenseReason</td>
+                <td>@Html.DisplayFor(modelItem => leaveRequest.AbsenseReason)</td>
                 <td>@leaveRequest.StartDate.ToShortDateString()</td>
                 <td>@leaveRequest.EndDate.ToShortDateString()</td>
                 <td>@leaveRequest.Comment</td>
@@ -32,8 +32,13 @@
     </tbody>
 </table>
 
+<div class="text-right mt-3">
+    <a href="@Url.Action("SubmitLeaveRequest", "LeaveRequest")" class="btn btn-primary">Submit Request</a>
+</div>
+
+
 @section Scripts {
-    <script>document.addEventListener("DOMContentLoaded", function() {
+    <script>document.addEventListener("DOMContentLoaded", function () {
             const getCellValue = (row, index) => row.children[index].innerText || row.children[index].textContent;
 
             const comparer = (index, asc) => (a, b) => ((v1, v2) =>
@@ -45,7 +50,7 @@
                 const tbody = table.querySelector('tbody');
                 Array.from(tbody.querySelectorAll('tr'))
                     .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
-                    .forEach(tr => tbody.appendChild(tr) );
+                    .forEach(tr => tbody.appendChild(tr));
             })));
         });</script>
 }
