@@ -4,7 +4,6 @@
 
 @model IEnumerable<Employee>
 
-
 <table class="table">
     <thead>
         <tr>
@@ -32,8 +31,11 @@
                 <td>@employee.PeoplePartner.FullName</td>
                 <td>@employee.Balance</td>
                 <td>
-                    <a href="@Url.Action("UpdateEmployee", "Employee",new { employeeID = employee.Id })" class="btn btn-custom-grey btn-sm">Update</a>
-                    <a href="@Url.Action("DeactivateEmployee", "Employee", new { id = employee.Id })" class="btn btn-custom-grey btn-sm">Deactivate</a>
+                    <a href="@Url.Action("UpdateEmployee", "Employee", new { employeeID = employee.Id })" class="btn btn-custom-grey btn-sm">Update</a>
+                    <form asp-action="DeactivateEmployee" method="post" style="display:inline;">
+                        <input type="hidden" name="employeeID" value="@employee.Id" />
+                        <button type="submit" class="btn btn-custom-grey btn-sm deactivate-btn" data-status="@employee.EmployeeStatus">Deactivate</button>
+                    </form>
                 </td>
             </tr>
         }
@@ -45,7 +47,7 @@
 </div>
 
 @section Scripts {
-    <script>document.addEventListener("DOMContentLoaded", function() {
+    <script>document.addEventListener("DOMContentLoaded", function () {
             const getCellValue = (row, index) => row.children[index].innerText || row.children[index].textContent;
 
             const comparer = (index, asc) => (a, b) => ((v1, v2) =>
@@ -57,7 +59,15 @@
                 const tbody = table.querySelector('tbody');
                 Array.from(tbody.querySelectorAll('tr'))
                     .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
-                    .forEach(tr => tbody.appendChild(tr) );
+                    .forEach(tr => tbody.appendChild(tr));
             })));
+
+            document.querySelectorAll('.deactivate-btn').forEach(button => {
+                const status = button.getAttribute('data-status');
+                if (status.toLowerCase() === 'inactive') {
+                    button.classList.add('disabled');
+                    button.href = "javascript:void(0)";
+                }
+            });
         });</script>
 }

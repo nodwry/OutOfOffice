@@ -99,6 +99,22 @@ namespace OutOfOffice.Controllers
             return View("UpdateEmployee", employee);
         }
 
+        [HttpPost]
+        public IActionResult DeactivateEmployee(int employeeID)
+        {
+            var employee = _dbContext.Employees.Find(employeeID);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            employee.EmployeeStatus = EmployeeStatus.Inactive;
+            _dbContext.Update(employee);
+            _dbContext.SaveChanges();
+
+            return RedirectToAction("ViewEmployees", employee);
+        }
+
     }
 
 }
