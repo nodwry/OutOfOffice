@@ -109,18 +109,13 @@ namespace OutOfOffice.Controllers
                     existingLeaveRequest.StartDate = leaveRequest.StartDate;
                     existingLeaveRequest.EndDate = leaveRequest.EndDate;
                     existingLeaveRequest.Comment = leaveRequest.Comment;
+                    existingLeaveRequest.LeaveRequestStatus = RequestStatus.Submitted;
                     existingLeaveRequest.LastStatusChange = DateTime.Now;
                     existingLeaveRequest.SubmittedTime = existingLeaveRequest.SubmittedTime;
 
-                    if(existingLeaveRequest.LeaveRequestStatus == RequestStatus.Cancelled)
-                    {
-                        existingLeaveRequest.LeaveRequestStatus = RequestStatus.Submitted;
-                    }
-
-                    else
-                    {
-                        existingLeaveRequest.LeaveRequestStatus = existingLeaveRequest.LeaveRequestStatus;
-                    }
+                    var approvalRequest = _dbContext.ApprovalRequests.Single(approvalRequest => approvalRequest.LeaveRequestId == existingLeaveRequest.Id);
+                    approvalRequest.ApprovalRequestStatus = RequestStatus.New;
+                    approvalRequest.LastStatusChange = DateTime.Now;
 
                     _dbContext.Update(existingLeaveRequest);
                     _dbContext.SaveChanges();
@@ -150,12 +145,18 @@ namespace OutOfOffice.Controllers
             }
 
             leaveRequest.LeaveRequestStatus = RequestStatus.Cancelled;
-           
-            _dbContext.Update(leaveRequest);
+
+            var approvalRequest = _dbContext.ApprovalRequests.Single(approvalRequest => approvalRequest.LeaveRequestId == leaveRequest.Id);
+            approvalRequest.ApprovalRequestStatus = RequestStatus.Cancelled;
+            approvalRequest.LastStatusChange = DateTime.Now;
+
+            _dbContext.UpdateRange(leaveRequest, approvalRequest);
             _dbContext.SaveChanges();
 
             return RedirectToAction("ViewLeaveRequests", leaveRequest);
         }
+
+  
     }
 }
 

@@ -8,28 +8,75 @@
     <thead>
         <tr>
             <th id="idHeader">ID</th>
-            <th id="approverHeader">Approver</th>
+            <th id="approverHeader">Employee ID</th>
             <th id="leaveRequestIdHeader">Leave Request ID</th>
             <th id="statusHeader">Status</th>
             <th id="commentHeader">Comment</th>
+            <th id="actionHeader">Action</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var approvalRequest in Model)
         {
             <tr>
-                <td>@approvalRequest.ID</td>
+                <td>@approvalRequest.Id</td>
                 <td>@approvalRequest.EmployeeId</td>
                 <td>@approvalRequest.LeaveRequestId</td>
                 <td>@approvalRequest.ApprovalRequestStatus</td>
                 <td>@approvalRequest.Comment</td>
+                <td>
+                    <form asp-action="ApproveRequest" method="post" style="display:inline;">
+                        <input type="hidden" name="approvalRequestId" value="@approvalRequest.Id" />
+                        <button type="submit" class="btn btn-custom-grey btn-sm approve-btn" data-status="@approvalRequest.ApprovalRequestStatus">Approve</button>
+                    </form>
+                    <button type="button" class="btn btn-custom-grey btn-sm reject-btn" data-id="@approvalRequest.Id" data-status="@approvalRequest.ApprovalRequestStatus">Reject</button>
+                    <button type="button" class="btn btn-custom-grey btn-sm details-btn" data-id="@approvalRequest.Id">Details</button>
+                </td>
             </tr>
         }
     </tbody>
 </table>
 
+<div id="rejectModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reject Request</h5>
+            </div>
+            <div class="modal-body">
+                <form id="rejectForm" method="post">
+                    <input type="hidden" name="approvalRequestId" id="rejectApprovalRequestId" />
+                    <div class="form-group">
+                        <label for="comment">Comment</label>
+                        <textarea class="form-control" id="comment" name="comment" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 20px;">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="margin-top: 20px;">Close</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="detailsModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Approval Request Details</h5>
+            </div>
+            <div class="modal-body">
+                <p><strong>Approval request ID:</strong> <span id="detailId"></span></p>
+                <p><strong>Employee Full Name:</strong> <span id="detailEmployeeFullName"></span></p>
+                <p><strong>Leave request ID:</strong> <span id="detailLeaveRequestId"></span></p>
+                <p><strong>Leave request comment:</strong> <span id="detailLeaveRequestComment"></span></p>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
-    <script>document.addEventListener("DOMContentLoaded", function() {
+    <script>document.addEventListener("DOMContentLoaded", function () {
             const getCellValue = (row, index) => row.children[index].innerText || row.children[index].textContent;
 
             const comparer = (index, asc) => (a, b) => ((v1, v2) =>
@@ -41,7 +88,69 @@
                 const tbody = table.querySelector('tbody');
                 Array.from(tbody.querySelectorAll('tr'))
                     .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
-                    .forEach(tr => tbody.appendChild(tr) );
+                    .forEach(tr => tbody.appendChild(tr));
             })));
+
+            document.querySelectorAll('#approvalRequestsTable tbody tr').forEach(row => {
+                const status = row.querySelector('td:nth-child(4)').innerText.trim().toLowerCase();
+                if (status === 'approved' || status === 'cancelled' || status === 'rejected') {
+                    row.querySelector('.approve-btn').disabled = true;
+                    row.querySelector('.reject-btn').disabled = true;
+                    row.querySelector('.approve-btn').classList.add('btn-disabled');
+                    row.querySelector('.reject-btn').classList.add('btn-disabled');
+                }
+            });
+
+            document.querySelectorAll('.reject-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const approvalRequestId = this.getAttribute('data-id');
+                    document.getElementById('rejectApprovalRequestId').value = approvalRequestId;
+                    $('#rejectModal').modal('show');
+                });
+            });
+
+            document.getElementById('rejectForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                const formData = new FormData(this);
+                const approvalRequestId = formData.get('approvalRequestId');
+                const comment = formData.get('comment');
+
+                fetch('/ApprovalRequest/RejectRequest', {
+                    method: 'POST',
+                    body: formData,
+                }).then(response => {
+                    if (response.ok) {
+                        const row = document.querySelector(`button[data-id="${approvalRequestId}"]`).closest('tr');
+                        row.querySelector('td:nth-child(5)').innerText = comment;
+                        row.querySelector('td:nth-child(4)').innerText = 'Rejected';
+
+                        row.querySelector('.approve-btn').disabled = true;
+                        row.querySelector('.reject-btn').disabled = true;
+                        row.querySelector('.approve-btn').classList.add('btn-disabled');
+                        row.querySelector('.reject-btn').classList.add('btn-disabled');
+
+                        $('#rejectModal').modal('hide');
+                    } else {
+                        alert('Failed to reject the request');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.details-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const approvalRequestId = this.getAttribute('data-id');
+
+                    fetch(`/ApprovalRequest/GetApprovalRequestDetails?id=${approvalRequestId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('detailId').innerText = data.id;
+                            document.getElementById('detailEmployeeFullName').innerText = data.employeeFullName;
+                            document.getElementById('detailLeaveRequestId').innerText = data.leaveRequestId;
+                            document.getElementById('detailLeaveRequestComment').innerText = data.leaveRequestComment;
+
+                            $('#detailsModal').modal('show');
+                        });
+                });
+            });
         });</script>
 }

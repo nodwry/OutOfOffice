@@ -5,7 +5,7 @@ namespace OutOfOffice.Models
 {
 	public class ApprovalRequest
 	{
-		public int ID { get; set; }
+		public int Id { get; set; }
 
 		public Employee? Employee { get; set; }
 
