@@ -25,7 +25,7 @@ namespace OutOfOffice.Models
 
 	public class LeaveRequest
 	{
-		public int ID { get; set; }
+		public int Id { get; set; }
 
         public Employee? Employee { get; set; }
 

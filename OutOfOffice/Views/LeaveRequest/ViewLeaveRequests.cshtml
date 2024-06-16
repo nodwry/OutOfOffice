@@ -14,19 +14,27 @@
             <th id="toHeader">To</th>
             <th id="commentHeader">Comment</th>
             <th id="statusHeader">Status</th>
+            <th id="actionHeader">Action</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var leaveRequest in Model)
         {
             <tr>
-                <td>@leaveRequest.ID</td>
+                <td>@leaveRequest.Id</td>
                 <td>@leaveRequest.EmployeeId</td>
                 <td>@Html.DisplayFor(modelItem => leaveRequest.AbsenseReason)</td>
                 <td>@leaveRequest.StartDate.ToShortDateString()</td>
                 <td>@leaveRequest.EndDate.ToShortDateString()</td>
                 <td>@leaveRequest.Comment</td>
                 <td>@leaveRequest.LeaveRequestStatus</td>
+                <td>
+                    <a href="@Url.Action("UpdateLeaveRequest", "LeaveRequest", new { leaveRequestId = leaveRequest.Id })" class="btn btn-custom-grey btn-sm">Update</a>
+                    <form asp-action="CancelLeaveRequest" method="post" style="display:inline;">
+                        <input type="hidden" name="leaveRequestId" value="@leaveRequest.Id" />
+                        <button type="submit" class="btn btn-custom-grey btn-sm cancel-btn" data-status="@leaveRequest.LeaveRequestStatus">Cancel request</button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>
@@ -52,5 +60,13 @@
                     .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
                     .forEach(tr => tbody.appendChild(tr));
             })));
+
+            document.querySelectorAll('.cancel-btn').forEach(button => {
+                const status = button.getAttribute('data-status');
+                if (status.toLowerCase() === 'cancelled') {
+                    button.classList.add('disabled');
+                    button.disabled = true;
+                }
+            });
         });</script>
 }
