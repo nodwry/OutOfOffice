@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OutOfOffice.Data;
 using OutOfOffice.Models;
 
@@ -30,19 +31,43 @@ namespace OutOfOffice.Controllers
         public IActionResult ApproveRequest(int approvalRequestId)
         {
             var approvalRequest = _dbContext.ApprovalRequests.Find(approvalRequestId);
+
             if (approvalRequest == null)
             {
                 return NotFound();
             }
 
+            var leaveRequest = _dbContext.LeaveRequests.Find(approvalRequest.LeaveRequestId);
+
+            if (leaveRequest == null)
+            {
+                return NotFound();
+            }
+
+            TimeSpan leaveDuration = leaveRequest.EndDate - leaveRequest.StartDate;
+            int daysAbsent = (int)leaveDuration.TotalDays + 1; 
+
+            var employee = _dbContext.Employees.Find(leaveRequest.EmployeeId);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            if (employee.Balance < daysAbsent)
+            {
+               TempData["ErrorMessage"] = "Employee balance is not enough.";
+               return RedirectToAction("ViewApprovalRequests");
+            }
+
             approvalRequest.ApprovalRequestStatus = RequestStatus.Approved;
             approvalRequest.LastStatusChange = DateTime.Now;
 
-            var leaveRequest = _dbContext.LeaveRequests.Find(approvalRequest.LeaveRequestId);
             leaveRequest.LeaveRequestStatus = RequestStatus.Approved;
             leaveRequest.LastStatusChange = DateTime.Now;
-            
-            _dbContext.UpdateRange(approvalRequest, leaveRequest);
+
+            employee.Balance -= daysAbsent;
+           
+            _dbContext.UpdateRange(approvalRequest, leaveRequest, employee);
             _dbContext.SaveChanges();
 
             return RedirectToAction("ViewApprovalRequests", approvalRequest);
@@ -74,28 +99,42 @@ namespace OutOfOffice.Controllers
         [HttpGet]
         public IActionResult GetApprovalRequestDetails(int id)
         {
-            var approvalRequestDetails = _dbContext.ApprovalRequests
-                .Where(approvalRequest => approvalRequest.Id == id)
-                .Select(approvalRequest => new
-                {
-                    approvalRequest.Id,
-                    EmployeeFullName = _dbContext.Employees.FirstOrDefault(employee => employee.Id == approvalRequest.EmployeeId).FullName,
-                    approvalRequest.LeaveRequestId,
-                    LeaveRequestComment = _dbContext.LeaveRequests.FirstOrDefault(leaveRequest => leaveRequest.Id == approvalRequest.LeaveRequestId).Comment,
-                    LeaveRequestAbsenceReason = _dbContext.LeaveRequests.FirstOrDefault(leaveRequest => leaveRequest.Id == approvalRequest.LeaveRequestId).AbsenseReason,
-                    approvalRequest.ApprovalRequestStatus,
-                    approvalRequest.LastStatusChange
-                })
-                .FirstOrDefault();
+            var approvalRequest = _dbContext.ApprovalRequests
+                .Include(approvalRequest => approvalRequest.Employee.PeoplePartner)
+                .Include(approvalRequest => approvalRequest.LeaveRequest)
+                .FirstOrDefault(approvalRequest => approvalRequest.Id == id);
 
-            if (approvalRequestDetails == null)
+            if (approvalRequest == null)
             {
                 return NotFound();
             }
 
-            return Json(approvalRequestDetails);
+            var data = new
+            {
+                id = approvalRequest.Id,
+                leaveRequestId = approvalRequest.LeaveRequestId,
+                employeeFullName = approvalRequest.Employee?.FullName,
+                leaveRequestComment = approvalRequest.LeaveRequest?.Comment ?? "N/A",
+                absenceReason = approvalRequest?.LeaveRequest?.AbsenseReason,
+                leaveRequestStatus = approvalRequest?.LeaveRequest?.LeaveRequestStatus.ToString(),
+                approverFullName = approvalRequest?.Employee?.PeoplePartner?.FullName,
+                approvalRequestStatus = approvalRequest?.ApprovalRequestStatus.ToString(),
+                lastStatusChange = approvalRequest?.LastStatusChange.ToString("yyyy-MM-ddTHH:mm:ss.fffffff")
+            };
+
+            return Json(data);
         }
 
+
+        //fix details (enum) in approval request details
+        //add approve logic (calculate days)
+
+        //add details to leave requests
+
+        //project details
+        //employee details
+        //assign employee to a project
+        //add/update/deactivate projects in the list
     }
 }
 

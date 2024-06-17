@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OutOfOffice.Data;
 
@@ -10,9 +11,11 @@ using OutOfOffice.Data;
 namespace OutOfOffice.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240617105747_AddPeoplePartnerIdToApprovalRequest")]
+    partial class AddPeoplePartnerIdToApprovalRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.5");
@@ -301,9 +304,6 @@ namespace OutOfOffice.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("LeaveRequestStatus")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("PeoplePartnerId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("StartDate")

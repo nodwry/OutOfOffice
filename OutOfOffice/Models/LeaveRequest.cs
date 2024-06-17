@@ -16,11 +16,16 @@ namespace OutOfOffice.Models
 
 	public enum RequestStatus
 	{
-		New,
-		Submitted,
-		Rejected,
-		Approved,
-		Cancelled
+        [Display(Name = "New")]
+        New,
+        [Display(Name = "Submitted")]
+        Submitted,
+        [Display(Name = "Rejected")]
+        Rejected,
+        [Display(Name = "Approved")]
+        Approved,
+        [Display(Name = "Cancelled")]
+        Cancelled
 	}
 
 	public class LeaveRequest

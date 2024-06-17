@@ -66,9 +66,14 @@
             </div>
             <div class="modal-body">
                 <p><strong>Approval request ID:</strong> <span id="detailId"></span></p>
-                <p><strong>Employee Full Name:</strong> <span id="detailEmployeeFullName"></span></p>
                 <p><strong>Leave request ID:</strong> <span id="detailLeaveRequestId"></span></p>
+                <p><strong>Employee Full Name:</strong> <span id="detailEmployeeFullName"></span></p>
                 <p><strong>Leave request comment:</strong> <span id="detailLeaveRequestComment"></span></p>
+                <p><strong>Absence Reason:</strong> <span id="detailAbsenceReason"></span></p>
+                <p><strong>Leave Request Status:</strong> <span id="detailLeaveRequestStatus"></span></p>
+                <p><strong>Approver:</strong> <span id="detailApproverFullName"></span></p>
+                <p><strong>Approval Request Status:</strong> <span id="detailApprovalRequestStatus"></span></p>
+                <p><strong>Last Status Change:</strong> <span id="detailLastStatusChange"></span></p>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
@@ -91,15 +96,24 @@
                     .forEach(tr => tbody.appendChild(tr));
             })));
 
-            document.querySelectorAll('#approvalRequestsTable tbody tr').forEach(row => {
-                const status = row.querySelector('td:nth-child(4)').innerText.trim().toLowerCase();
-                if (status === 'approved' || status === 'cancelled' || status === 'rejected') {
-                    row.querySelector('.approve-btn').disabled = true;
-                    row.querySelector('.reject-btn').disabled = true;
-                    row.querySelector('.approve-btn').classList.add('btn-disabled');
-                    row.querySelector('.reject-btn').classList.add('btn-disabled');
-                }
-            });
+            const formatDate = (dateString) => {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            };
+
+            const disableButtons = (selector, statuses) => {
+                document.querySelectorAll(selector).forEach(button => {
+                    const status = button.getAttribute('data-status').toLowerCase();
+                    if (statuses.includes(status)) {
+                        button.classList.add('disabled');
+                        button.disabled = true;
+                    }
+                });
+            };
+
+            const statusesToDisable = ['cancelled', 'rejected', 'approved'];
+            disableButtons('.approve-btn', statusesToDisable);
+            disableButtons('.reject-btn', statusesToDisable);
 
             document.querySelectorAll('.reject-btn').forEach(button => {
                 button.addEventListener('click', function () {
@@ -139,18 +153,37 @@
             document.querySelectorAll('.details-btn').forEach(button => {
                 button.addEventListener('click', function () {
                     const approvalRequestId = this.getAttribute('data-id');
+                    const startDate = this.getAttribute('data-start-date');
+                    const endDate = this.getAttribute('data-end-date');
 
                     fetch(`/ApprovalRequest/GetApprovalRequestDetails?id=${approvalRequestId}`)
                         .then(response => response.json())
                         .then(data => {
                             document.getElementById('detailId').innerText = data.id;
-                            document.getElementById('detailEmployeeFullName').innerText = data.employeeFullName;
                             document.getElementById('detailLeaveRequestId').innerText = data.leaveRequestId;
-                            document.getElementById('detailLeaveRequestComment').innerText = data.leaveRequestComment;
+                            document.getElementById('detailEmployeeFullName').innerText = data.employeeFullName;
+                            document.getElementById('detailLeaveRequestComment').innerText = data.leaveRequestComment ?? 'N/A';
+                            document.getElementById('detailAbsenceReason').innerText = getAbsenceReasonDisplayName(data.absenceReason);
+                            document.getElementById('detailLeaveRequestStatus').innerText = data.leaveRequestStatus;
+                            document.getElementById('detailApproverFullName').innerText = data.approverFullName;
+                            document.getElementById('detailApprovalRequestStatus').innerText = data.approvalRequestStatus;
+                            document.getElementById('detailLastStatusChange').innerText = formatDate(data.lastStatusChange);
 
                             $('#detailsModal').modal('show');
+                        })
+                        .catch(error => {
+                            console.error('Error fetching approval request details:', error);
                         });
                 });
             });
+
+            const getAbsenceReasonDisplayName = (reason) => {
+                switch (reason) {
+                    case 0: return 'Vacation';
+                    case 1: return 'Sick Leave';
+                    case 2: return 'Family Event';
+                    default: return 'Unknown';
+                }
+            };
         });</script>
 }

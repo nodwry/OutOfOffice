@@ -23,7 +23,7 @@ namespace OutOfOffice.Controllers
 
         public IActionResult ViewLeaveRequests()
         {
-            var leaveRequests = _dbContext.LeaveRequests.ToList();
+            var leaveRequests = _dbContext.LeaveRequests.Include(leaveRequests => leaveRequests.Employee).ToList();
 
             return View(leaveRequests);
         }
@@ -56,11 +56,11 @@ namespace OutOfOffice.Controllers
                         ApprovalRequestStatus = RequestStatus.New,
                         LastStatusChange = DateTime.Now,
                         EmployeeId = leaveRequest.EmployeeId,
-                        LeaveRequestId = leaveRequest.Id
+                        LeaveRequestId = leaveRequest.Id,
                     });
                     _dbContext.SaveChanges();
 
-                    return RedirectToAction("ViewLeaveRequests");
+                    return RedirectToAction("ViewLeaveRequests", leaveRequest);
                 }
                 catch (Exception ex)
                 {

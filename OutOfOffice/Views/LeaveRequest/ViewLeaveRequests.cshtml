@@ -8,7 +8,7 @@
     <thead>
         <tr>
             <th id="idHeader">ID</th>
-            <th id="employeeIdHeader">Employee ID</th>
+            <th id="employeeIdHeader">Approver</th>
             <th id="absenceReasonHeader">Absence Reason</th>
             <th id="fromHeader">From</th>
             <th id="toHeader">To</th>
@@ -22,17 +22,23 @@
         {
             <tr>
                 <td>@leaveRequest.Id</td>
-                <td>@leaveRequest.EmployeeId</td>
+                <td>@leaveRequest.Employee?.PeoplePartnerId</td>
                 <td>@Html.DisplayFor(modelItem => leaveRequest.AbsenseReason)</td>
                 <td>@leaveRequest.StartDate.ToShortDateString()</td>
                 <td>@leaveRequest.EndDate.ToShortDateString()</td>
                 <td>@leaveRequest.Comment</td>
                 <td>@leaveRequest.LeaveRequestStatus</td>
                 <td>
-                    <a href="@Url.Action("UpdateLeaveRequest", "LeaveRequest", new { leaveRequestId = leaveRequest.Id })" class="btn btn-custom-grey btn-sm">Update</a>
+                    <a href="@Url.Action("UpdateLeaveRequest", "LeaveRequest", new { leaveRequestId = leaveRequest.Id })"
+                       class="btn btn-custom-grey btn-sm update-btn"
+                       data-status="@leaveRequest.LeaveRequestStatus">Update</a>
                     <form asp-action="CancelLeaveRequest" method="post" style="display:inline;">
                         <input type="hidden" name="leaveRequestId" value="@leaveRequest.Id" />
-                        <button type="submit" class="btn btn-custom-grey btn-sm cancel-btn" data-status="@leaveRequest.LeaveRequestStatus">Cancel request</button>
+                        <button type="submit"
+                                class="btn btn-custom-grey btn-sm cancel-btn"
+                                data-status="@leaveRequest.LeaveRequestStatus">
+                            Cancel request
+                        </button>
                     </form>
                 </td>
             </tr>
@@ -43,7 +49,6 @@
 <div class="text-right mt-3">
     <a href="@Url.Action("SubmitLeaveRequest", "LeaveRequest")" class="btn btn-primary">Submit Request</a>
 </div>
-
 
 @section Scripts {
     <script>document.addEventListener("DOMContentLoaded", function () {
@@ -61,12 +66,18 @@
                     .forEach(tr => tbody.appendChild(tr));
             })));
 
-            document.querySelectorAll('.cancel-btn').forEach(button => {
-                const status = button.getAttribute('data-status');
-                if (status.toLowerCase() === 'cancelled') {
-                    button.classList.add('disabled');
-                    button.disabled = true;
-                }
-            });
+            const disableButtons = (selector, statuses) => {
+                document.querySelectorAll(selector).forEach(button => {
+                    const status = button.getAttribute('data-status').toLowerCase();
+                    if (statuses.includes(status)) {
+                        button.classList.add('disabled');
+                        button.disabled = true;
+                    }
+                });
+            };
+
+            const statusesToDisable = ['cancelled', 'rejected', 'approved'];
+            disableButtons('.update-btn', statusesToDisable);
+            disableButtons('.cancel-btn', statusesToDisable);
         });</script>
 }
