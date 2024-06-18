@@ -6,9 +6,9 @@ namespace OutOfOffice.Models
 {
     public enum ProjectTypes
     {
-        Billiable,
-        [Display(Name = "Non-billiable")]
-        NonBilliable
+        Billable,
+        [Display(Name = "Non-billable")]
+        NonBillable
     }
 
     public enum ProjectStatus

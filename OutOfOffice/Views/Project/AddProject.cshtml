@@ -1,0 +1,62 @@
+﻿@model Project
+
+@{
+    ViewData["Title"] = "Add Project";
+}
+
+<h1>Add Project</h1>
+
+<form asp-action="PostAddProject" method="post">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ProjectType"></label>
+        <select asp-for="ProjectType" class="form-control">
+            @foreach (var type in Enum.GetValues(typeof(ProjectTypes)))
+            {
+                <option value="@type">@type</option>
+            }
+        </select>
+        <span asp-validation-for="ProjectType" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="StartDate"></label>
+        <input asp-for="StartDate" class="form-control" type="date" />
+        <span asp-validation-for="StartDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EndDate"></label>
+        <input asp-for="EndDate" class="form-control" type="date" />
+        <span asp-validation-for="EndDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ProjectManagerID">Project Manager</label>
+        @Html.DropDownList("ProjectManagerID", ViewBag.ProjectManagers as SelectList, "-- Select Project Manager --", new { @class = "form-control" })
+        <span asp-validation-for="ProjectManagerID" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Comment"></label>
+        <textarea asp-for="Comment" class="form-control"></textarea>
+        <span asp-validation-for="Comment" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Status"></label>
+        <select asp-for="Status" class="form-control">
+            <option value="">-- Select Project Status --</option>
+            @foreach (var status in Enum.GetValues(typeof(ProjectStatus)))
+            {
+                <option value="@status">@status</option>
+            }
+        </select>
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary" style="margin-top: 20px;">Add Project</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

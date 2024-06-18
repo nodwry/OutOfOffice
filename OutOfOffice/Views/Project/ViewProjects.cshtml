@@ -15,6 +15,7 @@
             <th id="projectManagerIDHeader">Project Manager ID</th>
             <th id="commentHeader">Comment</th>
             <th id="statusHeader">Status</th>
+            <th id="actionHeader">Action</th>
         </tr>
     </thead>
     <tbody>
@@ -22,7 +23,7 @@
         {
             <tr>
                 <td>@project.Id</td>
-                <td>@project.ProjectType</td>
+                <td>@Html.DisplayFor(modelItem => project.ProjectType)</td>
                 <td>@project.StartDate.ToShortDateString()</td>
                 <td>@project.EndDate.ToShortDateString()</td>
                 <td>@project.ProjectManagerID</td>
@@ -32,6 +33,10 @@
         }
     </tbody>
 </table>
+
+<div class="text-right mb-3">
+    <a href="@Url.Action("AddProject", "Project")" class="btn btn-primary">Add Project</a>
+</div>
 
 @section Scripts {
     <script>document.addEventListener("DOMContentLoaded", function() {
