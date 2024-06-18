@@ -128,12 +128,11 @@ namespace OutOfOffice.Controllers
 
         //fix details (enum) in approval request details
         //add approve logic (calculate days)
+        //assign employee to a project
 
         //add details to leave requests
-
         //project details
         //employee details
-        //assign employee to a project
         //add/update/deactivate projects in the list
     }
 }

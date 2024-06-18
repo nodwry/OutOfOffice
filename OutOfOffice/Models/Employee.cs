@@ -57,10 +57,12 @@ namespace OutOfOffice.Models
         [Required(ErrorMessage = "Please enter the balance")]
         public int Balance { get; set; }
 
-		//photo
-		
+        public List<Project> Projects { get; set; } = new List<Project>();
+
+        //photo
 
 
-	}
+
+    }
 }
 

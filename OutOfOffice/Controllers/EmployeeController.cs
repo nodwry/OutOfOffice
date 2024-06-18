@@ -24,7 +24,14 @@ namespace OutOfOffice.Controllers
         {
             var employees = _dbContext.Employees.ToList();
 
+            ViewBag.Projects = _dbContext.Projects.Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.Name != null ? $"{p.Id} - {p.Name}" : p.Id.ToString()
+            }).ToList();
+
             return View(employees);
+
         }
 
         public IActionResult AddEmployee()

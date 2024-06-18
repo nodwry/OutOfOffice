@@ -15,5 +15,19 @@ public class ApplicationDbContext : IdentityDbContext
         : base(options)
     {
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Project>()
+            .HasOne(p => p.ProjectManager)
+            .WithMany()
+            .HasForeignKey(p => p.ProjectManagerID);
+
+        modelBuilder.Entity<Project>()
+            .HasMany(p => p.AssignedEmployees)
+            .WithMany(e => e.Projects);
+    }
 }
 

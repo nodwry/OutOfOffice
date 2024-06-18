@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using OutOfOffice.Data;
 
 namespace OutOfOffice.Controllers
@@ -23,6 +25,34 @@ namespace OutOfOffice.Controllers
             var projects = _dbContext.Projects.ToList();
 
             return View(projects);
+        }
+
+        public IActionResult AssignEmployeeToProject()
+        {
+            ViewBag.Projects = _dbContext.Projects.Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.Name != null ? $"{p.Id} - {p.Name}" : p.Id.ToString()
+            }).ToList();
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult AssignEmployeeToProject(int employeeId, int projectId)
+        {
+            var employee = _dbContext.Employees.Include(e => e.Projects).FirstOrDefault(e => e.Id == employeeId);
+            var project = _dbContext.Projects.Include(p => p.AssignedEmployees).FirstOrDefault(p => p.Id == projectId);
+
+            if (employee == null || project == null)
+            {
+                return NotFound();
+            }
+
+            project.AssignedEmployees.Add(employee);
+            _dbContext.SaveChanges();
+
+            return RedirectToAction("ViewEmployees", "Employee");
         }
     }
 }

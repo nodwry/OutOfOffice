@@ -21,6 +21,8 @@ namespace OutOfOffice.Models
 	{
         public int Id { get; set; }
 
+        public string? Name { get; set; }
+
         public ProjectTypes ProjectType { get; set; }
 
         public DateTime StartDate { get; set; }
@@ -35,6 +37,7 @@ namespace OutOfOffice.Models
 
         public ProjectStatus Status { get; set; }
 
+        public List<Employee> AssignedEmployees { get; set; } = new List<Employee>();
     }
 }
 

@@ -28,7 +28,7 @@
                 <td>@Html.DisplayFor(modelItem => employee.Position)</td>
                 <td>@employee.EmployeeStatus</td>
                 <td>@employee.PeoplePartnerId</td>
-                <td>@employee.PeoplePartner.FullName</td>
+                <td>@employee.PeoplePartner?.FullName</td>
                 <td>@employee.Balance</td>
                 <td>
                     <a href="@Url.Action("UpdateEmployee", "Employee", new { employeeID = employee.Id })" class="btn btn-custom-grey btn-sm">Update</a>
@@ -36,6 +36,7 @@
                         <input type="hidden" name="employeeID" value="@employee.Id" />
                         <button type="submit" class="btn btn-custom-grey btn-sm deactivate-btn" data-status="@employee.EmployeeStatus">Deactivate</button>
                     </form>
+                    <button class="btn btn-custom-grey btn-sm assign-project-btn" data-employee-id="@employee.Id">Assign to Project</button>
                 </td>
             </tr>
         }
@@ -46,14 +47,41 @@
     <a href="@Url.Action("AddEmployee", "Employee")" class="btn btn-primary">Add Employee</a>
 </div>
 
+<div id="assignProjectModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Assign to Project</h5>
+            </div>
+            <div class="modal-body">
+                <form id="assignProjectForm" method="post" action="@Url.Action("AssignEmployeeToProject", "Project")">
+                    <input type="hidden" name="employeeId" id="employeeId" value="" />
+                    <div class="form-group">
+                        <label for="projectId">Select Project</label>
+                        <select name="projectId" id="projectId" class="form-control">
+                            @foreach (var project in ViewBag.Projects)
+                            {
+                                <option value="@project.Value">@project.Text</option>
+                            }
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="assignProjectButton">Assign</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @section Scripts {
     <script>document.addEventListener("DOMContentLoaded", function () {
             const getCellValue = (row, index) => row.children[index].innerText || row.children[index].textContent;
-
             const comparer = (index, asc) => (a, b) => ((v1, v2) =>
                 v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
             )(getCellValue(asc ? a : b, index), getCellValue(asc ? b : a, index));
-
             document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
                 const table = th.closest('table');
                 const tbody = table.querySelector('tbody');
@@ -68,6 +96,18 @@
                     button.classList.add('disabled');
                     button.href = "javascript:void(0)";
                 }
+            });
+
+            document.querySelectorAll('.assign-project-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const employeeId = this.getAttribute('data-employee-id');
+                    document.getElementById('employeeId').value = employeeId;
+                    $('#assignProjectModal').modal('show');
+                });
+            });
+
+            document.getElementById('assignProjectButton').addEventListener('click', function () {
+                document.getElementById('assignProjectForm').submit();
             });
         });</script>
 }
