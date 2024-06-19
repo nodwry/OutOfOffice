@@ -48,7 +48,7 @@
 ### Form to show approval request details
 <img width="686" alt="Знімок екрана 2024-06-20 о 01 55 44" src="https://github.com/nodwry/OutOfOffice/assets/166646734/1b6745b5-e70a-4ed0-a736-a90daf61eec7">
 
-## Schema of table relations
+## Database schema of table relations
 ![schema](https://github.com/nodwry/OutOfOffice/assets/166646734/f61292f3-e202-499f-96fd-5b508bd87a94)
 
 ## SQL script to create the database
