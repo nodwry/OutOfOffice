@@ -156,7 +156,35 @@ namespace OutOfOffice.Controllers
             return RedirectToAction("ViewLeaveRequests", leaveRequest);
         }
 
-  
+        [HttpGet]
+        public IActionResult GetLeaveRequestDetails(int id)
+        {
+            var leaveRequest = _dbContext.LeaveRequests
+                .Include(leaveRequest => leaveRequest.Employee)
+                .FirstOrDefault(leaveRequest => leaveRequest.Id == id);
+
+            if (leaveRequest == null)
+            {
+                return NotFound();
+            }
+
+            var data = new
+            {
+                id = leaveRequest.Id,
+                employeeId = leaveRequest.EmployeeId,
+                employeeFullName = leaveRequest.Employee?.FullName,
+                absenceReason = leaveRequest?.AbsenseReason.ToString(),
+                leaveRequestComment = leaveRequest?.Comment ?? "N/A",
+                startDate = leaveRequest?.StartDate.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"),
+                endDate = leaveRequest?.EndDate.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"),
+                submittedTime = leaveRequest?.SubmittedTime.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"),
+                leaveRequestStatus = leaveRequest?.LeaveRequestStatus.ToString(),
+                lastStatusChange = leaveRequest?.LastStatusChange.ToString("yyyy-MM-ddTHH:mm:ss.fffffff")
+            };
+
+            return Json(data);
+        }
+
     }
 }
 

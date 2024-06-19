@@ -124,13 +124,6 @@ namespace OutOfOffice.Controllers
 
             return Json(data);
         }
-
-
-        //add details to leave requests
-
-        //employee details
-        //project details
-        //update/deactivate projects in the list
     }
 }
 
