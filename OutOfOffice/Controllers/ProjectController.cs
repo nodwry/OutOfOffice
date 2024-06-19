@@ -92,6 +92,118 @@ namespace OutOfOffice.Controllers
 
             return View("AddProject", project);
         }
+
+        //
+
+        [HttpGet]
+        public IActionResult UpdateProject(int projectId)
+        {
+            var project = _dbContext.Projects.Find(projectId);
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.ProjectManagers = new SelectList(
+                _dbContext.Employees
+                    .Where(e => e.Position == Position.PM)
+                    .OrderBy(e => e.FullName)
+                    .ToList(),
+                "Id",
+                "FullName"
+            );
+
+            return View("UpdateProject", project);
+        }
+
+        [HttpPost]
+        public IActionResult PostUpdateProject(Project project)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var existingProject = _dbContext.Projects.Find(project.Id);
+                    if (existingProject == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingProject.Name = project.Name;
+                    existingProject.ProjectType = project.ProjectType;
+                    existingProject.StartDate = project.StartDate;
+                    existingProject.EndDate = project.EndDate;
+                    existingProject.ProjectManagerID = project.ProjectManagerID;
+                    existingProject.Comment = project.Comment;
+                    existingProject.Status = project.Status;
+
+                    _dbContext.Update(existingProject);
+                    _dbContext.SaveChanges();
+
+                    return RedirectToAction("ViewProjects");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error updating project: " + ex.Message);
+                }
+            }
+
+            ViewBag.ProjectManagers = new SelectList(
+                _dbContext.Employees
+                    .Where(e => e.Position == Position.PM)
+                    .OrderBy(e => e.FullName)
+                    .ToList(),
+                "Id",
+                "FullName"
+            );
+
+            return View("UpdateProject", project);
+        }
+
+        [HttpPost]
+        public IActionResult DeactivateProject(int projectId)
+        {
+            var project = _dbContext.Projects.Find(projectId);
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            project.Status = ProjectStatus.Inactive;
+            _dbContext.Update(project);
+            _dbContext.SaveChanges();
+
+            return RedirectToAction("ViewProjects", project);
+        }
+
+        [HttpGet]
+        public IActionResult GetProjectDetails(int projectId)
+        {
+            var project = _dbContext.Projects
+                .Include(project => project.ProjectManager)
+                .Include(project => project.AssignedEmployees)
+                .FirstOrDefault(project => project.Id == projectId);
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            var projectDetails = new
+            {
+                id = project.Id,
+                name = project.Name,
+                startDate = project.StartDate,
+                endDate = project.EndDate,
+                projectManager = project.ProjectManager?.FullName,
+                comment = project.Comment ?? "N/A",
+                status = project.Status.ToString(),
+                assignedEmployees = project.AssignedEmployees.Select(e => new { fullName = e.FullName }).ToList()
+            };
+
+            return Json(projectDetails);
+        }
+
     }
 }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using OutOfOffice.Data;
 using OutOfOffice.Models;
 
@@ -122,8 +123,38 @@ namespace OutOfOffice.Controllers
             return RedirectToAction("ViewEmployees", employee);
         }
 
+        [HttpGet]
+        public IActionResult GetEmployeeDetails(int employeeId)
+        {
+            var employee = _dbContext.Employees
+                .Include(e => e.PeoplePartner)
+                .Include(e => e.Projects)
+                .FirstOrDefault(e => e.Id == employeeId);
+
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            var employeeDetails = new
+            {
+                id = employee.Id,
+                fullName = employee.FullName,
+                position = employee.Position.ToString(),
+                subdivision = employee.Subdivision.ToString(),
+                employeeStatus = employee.EmployeeStatus.ToString(),
+                peoplePartnerId = employee.PeoplePartnerId,
+                peoplePartner = new { fullName = employee.PeoplePartner?.FullName },
+                balance = employee.Balance,
+                projects = employee.Projects.Select(p => new { id = p.Id, name = p.Name }).ToList()
+            };
+
+            return Json(employeeDetails);
+        }
     }
 
 }
+
+
 
 

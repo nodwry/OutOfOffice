@@ -29,6 +29,14 @@
                 <td>@project.ProjectManagerID</td>
                 <td>@project.Comment</td>
                 <td>@project.Status</td>
+                <td>
+                    <a href="@Url.Action("UpdateProject", "Project", new { projectId = project.Id })" class="btn btn-custom-grey btn-sm">Update</a>
+                    <form asp-action="DeactivateProject" method="post" style="display:inline;">
+                        <input type="hidden" name="projectId" value="@project.Id" />
+                        <button type="submit" class="btn btn-custom-grey btn-sm" @(project.Status == ProjectStatus.Inactive ? "disabled" : "")>Deactivate</button>
+                    </form>
+                    <button type="button" class="btn btn-custom-grey btn-sm" onclick="showProjectDetails(@project.Id)">Details</button>
+                </td>
             </tr>
         }
     </tbody>
@@ -38,8 +46,56 @@
     <a href="@Url.Action("AddProject", "Project")" class="btn btn-primary">Add Project</a>
 </div>
 
+<div id="projectDetailsModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Project Details</h5>
+            </div>
+            <div class="modal-body" id="projectDetailsContent">
+                <p><strong>Project ID:</strong> <span id="projectId"></span></p>
+                <p><strong>Project Name:</strong> <span id="projectName"></span></p>
+                <p><strong>Start Date:</strong> <span id="startDate"></span></p>
+                <p><strong>End Date:</strong> <span id="endDate"></span></p>
+                <p><strong>Project Manager:</strong> <span id="projectManager"></span></p>
+                <p><strong>Comment:</strong> <span id="comment"></span></p>
+                <p><strong>Status:</strong> <span id="status"></span></p>
+                <p><strong>Assigned Employees:</strong></p>
+                <ul id="assignedEmployees"></ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @section Scripts {
-    <script>document.addEventListener("DOMContentLoaded", function() {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showProjectDetails(projectId) {
+            $.get("@Url.Action("GetProjectDetails", "Project")", { projectId: projectId }, function(data) {
+                $("#projectId").text(data.id);
+                $("#projectName").text(data.name);
+                $("#startDate").text(new Date(data.startDate).toLocaleDateString());
+                $("#endDate").text(new Date(data.endDate).toLocaleDateString());
+                $("#projectManager").text(data.projectManager ? data.projectManager : "");
+                $("#comment").text(data.comment);
+                $("#status").text(data.status);
+
+                var assignedEmployeesList = $("#assignedEmployees");
+                assignedEmployeesList.empty();
+                data.assignedEmployees.forEach(function(employee) {
+                    assignedEmployeesList.append("<li>" + employee.fullName + "</li>");
+                });
+
+                $("#projectDetailsModal").modal("show");
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
             const getCellValue = (row, index) => row.children[index].innerText || row.children[index].textContent;
 
             const comparer = (index, asc) => (a, b) => ((v1, v2) =>
@@ -53,7 +109,8 @@
                     .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
                     .forEach(tr => tbody.appendChild(tr) );
             })));
-        });</script>
+        });
+    </script>
 }
 
 

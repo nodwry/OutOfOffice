@@ -36,6 +36,7 @@
                         <input type="hidden" name="employeeID" value="@employee.Id" />
                         <button type="submit" class="btn btn-custom-grey btn-sm deactivate-btn" data-status="@employee.EmployeeStatus">Deactivate</button>
                     </form>
+                    <button type="button" class="btn btn-custom-grey btn-sm" onclick="showEmployeeDetails(@employee.Id)">Details</button>
                     <button class="btn btn-custom-grey btn-sm assign-project-btn" data-employee-id="@employee.Id">Assign to Project</button>
                 </td>
             </tr>
@@ -75,13 +76,64 @@
     </div>
 </div>
 
+<div id="employeeDetailsModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Employee Details</h5>
+            </div>
+            <div class="modal-body" id="employeeDetailsContent">
+                <p><strong>Employee ID:</strong> <span id="employeeIdDetail"></span></p>
+                <p><strong>Full Name:</strong> <span id="fullName"></span></p>
+                <p><strong>Position:</strong> <span id="position"></span></p>
+                <p><strong>Subdivision:</strong> <span id="subdivision"></span></p>
+                <p><strong>Projects:</strong></p>
+                <ul id="projects"></ul>
+                <p><strong>Employee Status:</strong> <span id="employeeStatus"></span></p>
+                <p><strong>People Partner ID:</strong> <span id="peoplePartnerIdDetail"></span></p>
+                <p><strong>People Partner:</strong> <span id="peoplePartner"></span></p>
+                <p><strong>Balance:</strong> <span id="balance"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
-    <script>document.addEventListener("DOMContentLoaded", function () {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showEmployeeDetails(employeeId) {
+            $.get("@Url.Action("GetEmployeeDetails", "Employee")", { employeeId: employeeId }, function(data) {
+                $("#employeeIdDetail").text(data.id);
+                $("#fullName").text(data.fullName);
+                $("#position").text(data.position);
+                $("#subdivision").text(data.subdivision);
+                $("#employeeStatus").text(data.employeeStatus);
+                $("#peoplePartnerIdDetail").text(data.peoplePartnerId);
+                $("#peoplePartner").text(data.peoplePartner ? data.peoplePartner.fullName : "");
+                $("#balance").text(data.balance);
+
+                var projectsList = $("#projects");
+                projectsList.empty();
+                data.projects.forEach(function(project) {
+                    projectsList.append("<li>" + project.id + " - " + project.name + "</li>");
+                });
+
+                $("#employeeDetailsModal").modal("show");
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
             const getCellValue = (row, index) => row.children[index].innerText || row.children[index].textContent;
+
             const comparer = (index, asc) => (a, b) => ((v1, v2) =>
                 v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
             )(getCellValue(asc ? a : b, index), getCellValue(asc ? b : a, index));
+
             document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
                 const table = th.closest('table');
                 const tbody = table.querySelector('tbody');
@@ -109,5 +161,6 @@
             document.getElementById('assignProjectButton').addEventListener('click', function () {
                 document.getElementById('assignProjectForm').submit();
             });
-        });</script>
+        });
+    </script>
 }

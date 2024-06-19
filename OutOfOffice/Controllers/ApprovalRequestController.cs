@@ -127,8 +127,9 @@ namespace OutOfOffice.Controllers
 
 
         //add details to leave requests
-        //project details
+
         //employee details
+        //project details
         //update/deactivate projects in the list
     }
 }

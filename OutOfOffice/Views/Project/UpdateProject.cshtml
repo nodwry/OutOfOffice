@@ -1,0 +1,67 @@
+﻿@model Project
+
+@{
+    ViewData["Title"] = "Update Project";
+}
+
+<h1>Update Project</h1>
+
+<form asp-action="PostUpdateProject" method="post">
+    <input asp-for="Id" type="hidden" />
+
+    <div class="form-group">
+        <label asp-for="Name">Project Name</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ProjectType">Project Type</label>
+        @Html.DropDownListFor(model => model.ProjectType, new SelectList(Enum.GetValues(typeof(ProjectTypes)).Cast<ProjectTypes>().Select(e => new SelectListItem
+        {
+            Value = e.ToString(),
+            Text = e == ProjectTypes.NonBillable ? "Non-billable" : e.ToString()
+        }), "Value", "Text", Model.ProjectType.ToString()), new { @class = "form-control" })
+        <span asp-validation-for="ProjectType" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="StartDate">Start Date</label>
+        <input asp-for="StartDate" class="form-control" type="date" />
+        <span asp-validation-for="StartDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="EndDate">End Date</label>
+        <input asp-for="EndDate" class="form-control" type="date" />
+        <span asp-validation-for="EndDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ProjectManagerID">Project Manager</label>
+        @Html.DropDownListFor(model => model.ProjectManagerID, ViewBag.ProjectManagers as SelectList, "-- Select Project Manager --", new { @class = "form-control" })
+        <span asp-validation-for="ProjectManagerID" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Comment">Comment</label>
+        <textarea asp-for="Comment" class="form-control"></textarea>
+        <span asp-validation-for="Comment" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Status">Status</label>
+        @Html.DropDownListFor(model => model.Status, new SelectList(Enum.GetValues(typeof(ProjectStatus)).Cast<ProjectStatus>().Select(s => new SelectListItem
+        {
+            Value = s.ToString(),
+            Text = s.ToString()
+        }), "Value", "Text", Model.Status.ToString()), "-- Select Status --", new { @class = "form-control" })
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="margin-top: 20px;">Update Project</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
